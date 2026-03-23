@@ -1,43 +1,12 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withRepeat,
-  withSequence,
-} from 'react-native-reanimated';
 
 interface SeparationProgressProps {
   progress: number;
 }
 
 export function SeparationProgress({ progress }: SeparationProgressProps) {
-  const pulseValue = useSharedValue(1);
-  const progressWidth = useSharedValue(0);
-
-  useEffect(() => {
-    pulseValue.value = withRepeat(
-      withSequence(
-        withTiming(1.1, { duration: 1000 }),
-        withTiming(1, { duration: 1000 })
-      ),
-      -1,
-      true
-    );
-    
-    progressWidth.value = withTiming(progress, { duration: 300 });
-  }, [progress]);
-
-  const pulseStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: pulseValue.value }],
-  }));
-
-  const progressStyle = useAnimatedStyle(() => ({
-    width: `${progressWidth.value}%`,
-  }));
-
   const getStatusText = () => {
     if (progress < 25) return 'Analyzing audio structure...';
     if (progress < 50) return 'Separating vocals...';
@@ -48,20 +17,20 @@ export function SeparationProgress({ progress }: SeparationProgressProps) {
 
   return (
     <View style={styles.container}>
-      <Animated.View style={[styles.iconContainer, pulseStyle]}>
+      <View style={styles.iconContainer}>
         <LinearGradient
           colors={['#8B5CF6', '#3B82F6']}
           style={styles.iconGradient}
         >
           <Text style={styles.iconText}>AI</Text>
         </LinearGradient>
-      </Animated.View>
+      </View>
 
       <Text style={styles.statusText}>{getStatusText()}</Text>
-      
+
       <View style={styles.progressContainer}>
         <View style={styles.progressTrack}>
-          <Animated.View style={[styles.progressFill, progressStyle]} />
+          <View style={[styles.progressFill, { width: `${progress}%` }]} />
         </View>
         <Text style={styles.progressText}>{Math.round(progress)}%</Text>
       </View>
